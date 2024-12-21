@@ -33,6 +33,9 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
+      - name: List files in directory
+        run: ls -R
+
       # Step 5: Attach the built JAR to the release
       - name: Upload JAR to Release
         uses: actions/upload-release-asset@v1
