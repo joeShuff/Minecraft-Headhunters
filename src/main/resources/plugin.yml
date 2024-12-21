@@ -1,0 +1,38 @@
+name: Headhunters
+version: ${project.version}
+main: com.joeshuff.headhunters.HeadHuntersPlugin
+api-version: 1.18
+description: A Minecraft plugin for tracking mob head collections and team progress.
+author: Joe Shufflebotham
+
+commands:
+  createteam:
+    description: Create a new team.
+    usage: /<command> <team name>
+  setshrine:
+    description: Set the shrine location for your team.
+    usage: /<command>
+  resummon:
+    description: Resummon the head of a specific mob.
+    usage: /<command> <mob_name>
+  progress:
+    description: View the progress of the team's collected heads.
+    usage: /<command>
+  missing:
+    description: See what mob heads are still needed by your team.
+    usage: /<command>
+  globalprogress:
+    description: View the global progress of all teams.
+    usage: /<command>
+  disablebossbar:
+    description: Disable the boss bar globally (admin only).
+    usage: /<command>
+  invite:
+    description: Invite a player to your team
+    usage: /<command> <player>
+  join:
+    description: Join a team
+    usage: /<command> <team_guid>
+  leaveteam:
+    description: Leave your current team.
+    usage: /leaveteam
