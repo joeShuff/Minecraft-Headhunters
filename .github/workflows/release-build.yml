@@ -47,3 +47,5 @@ jobs:
           asset_path: target/HeadHunters-${{ github.event.release.tag_name }}.jar
           asset_name: HeadHunters-${{ github.event.release.tag_name }}.jar
           asset_content_type: application/java-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
