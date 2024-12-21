@@ -1,6 +1,8 @@
 package com.joeshuff.headhunters.commands.teams
 
 import com.joeshuff.headhunters.database.TeamDatabaseHandler
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -10,7 +12,7 @@ class JoinCommand(private val teamDatabaseHandler: TeamDatabaseHandler) : Comman
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (sender !is Player) {
-            sender.sendMessage("Only players can join teams!")
+            sender.sendMessage(TextComponent("Only players can join teams!").apply { color = ChatColor.RED })
             return true
         }
 
@@ -18,7 +20,7 @@ class JoinCommand(private val teamDatabaseHandler: TeamDatabaseHandler) : Comman
 
         // Ensure the player provides a team GUID
         if (args.isEmpty()) {
-            player.sendMessage("Please provide the team GUID.")
+            player.sendMessage(TextComponent("Please provide the team GUID.").apply { color = ChatColor.YELLOW })
             return true
         }
 
@@ -26,14 +28,19 @@ class JoinCommand(private val teamDatabaseHandler: TeamDatabaseHandler) : Comman
 
         val team = teamDatabaseHandler.getTeamById(teamGuid)
         if (team == null) {
-            player.sendMessage("The team with GUID '$teamGuid' does not exist.")
+            player.sendMessage(TextComponent("The team with GUID '$teamGuid' does not exist.").apply {
+                color = ChatColor.RED
+            })
             return true
         }
 
         // Add player to the team
         teamDatabaseHandler.addPlayerToTeam(player, team.id)
 
-        player.sendMessage("You have successfully joined the team '${team.teamName}'.")
+        player.sendMessage(TextComponent("You have successfully joined the team '${team.teamName}'.").apply {
+            color = ChatColor.GREEN
+        })
         return true
     }
+
 }

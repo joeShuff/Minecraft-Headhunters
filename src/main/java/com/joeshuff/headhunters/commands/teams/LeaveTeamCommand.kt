@@ -1,6 +1,8 @@
 package com.joeshuff.headhunters.commands.teams
 
 import com.joeshuff.headhunters.database.TeamDatabaseHandler
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -10,7 +12,7 @@ class LeaveTeamCommand(val teamDatabaseHandler: TeamDatabaseHandler) : CommandEx
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (sender !is Player) {
-            sender.sendMessage("Only players can leave a team!")
+            sender.sendMessage(TextComponent("Only players can leave a team!").apply { color = ChatColor.RED })
             return true
         }
 
@@ -19,11 +21,12 @@ class LeaveTeamCommand(val teamDatabaseHandler: TeamDatabaseHandler) : CommandEx
         val success = teamDatabaseHandler.removePlayerFromTeam(player)
 
         if (success) {
-            player.sendMessage("§aYou have successfully left your team.")
+            player.sendMessage(TextComponent("You have successfully left your team.").apply { color = ChatColor.GREEN })
         } else {
-            player.sendMessage("§cYou are not currently in any team.")
+            player.sendMessage(TextComponent("You are not currently in any team.").apply { color = ChatColor.RED })
         }
 
         return true
     }
+
 }
