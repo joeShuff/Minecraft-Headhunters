@@ -1,17 +1,13 @@
-package com.joeshuff.headhunters
+package com.joeshuff.headhunters.util
 
 import com.google.gson.Gson
-import com.mojang.authlib.minecraft.MinecraftProfileTexture
-import com.mojang.authlib.properties.Property
+import com.joeshuff.headhunters.HeadHuntersPlugin
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
-import org.bukkit.profile.PlayerProfile
-import org.bukkit.profile.PlayerTextures
 import java.io.InputStreamReader
-import java.lang.reflect.Field
 
 class SkullController(val plugin: HeadHuntersPlugin) {
 

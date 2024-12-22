@@ -1,5 +1,9 @@
 package com.joeshuff.headhunters
 
+import com.joeshuff.headhunters.commands.skulls.GlobalProgressCommand
+import com.joeshuff.headhunters.commands.skulls.MissingCommand
+import com.joeshuff.headhunters.commands.skulls.ProgressCommand
+import com.joeshuff.headhunters.commands.skulls.ResummonCommand
 import com.joeshuff.headhunters.commands.teams.*
 import com.joeshuff.headhunters.database.DatabaseHandler
 import com.joeshuff.headhunters.database.ShrineDatabaseHandler
@@ -9,6 +13,9 @@ import com.joeshuff.headhunters.listeners.PlayerListener
 import com.joeshuff.headhunters.listeners.SkullEarnedListener
 import com.joeshuff.headhunters.listeners.Stoppable
 import com.joeshuff.headhunters.regions.RegionManager
+import com.joeshuff.headhunters.timers.TeamProgressTask
+import com.joeshuff.headhunters.util.BossBarManager
+import com.joeshuff.headhunters.util.SkullController
 import org.bukkit.plugin.java.JavaPlugin
 
 class HeadHuntersPlugin : JavaPlugin() {
@@ -24,12 +31,15 @@ class HeadHuntersPlugin : JavaPlugin() {
     private val teamDatabaseHandler = TeamDatabaseHandler(this, dbHandler)
     private val skullDatabaseHandler = SkullDatabaseHandler(this, dbHandler)
 
-    override fun onEnable() {
-        registerCommands()
-        registerEventListeners()
+    private val bossBarManager = BossBarManager()
 
+    override fun onEnable() {
         saveResource("head_data.json", true)
         saveDefaultConfig()
+
+        registerCommands()
+        registerEventListeners()
+        setupTimers()
 
         logger.info("====================")
         logger.info("HEAD HUNTER PLUGIN LOADED")
@@ -40,6 +50,12 @@ class HeadHuntersPlugin : JavaPlugin() {
         // Plugin shutdown logic
         stoppables.forEach { it.stop() }
         dbHandler.closeConnection()
+        bossBarManager.clearAll()
+    }
+
+    private fun setupTimers() {
+        TeamProgressTask(teamDatabaseHandler, skullDatabaseHandler, bossBarManager)
+            .runTaskTimer(this, 0L, 20L) // Runs every second
     }
 
     private fun registerCommands() {
@@ -52,17 +68,16 @@ class HeadHuntersPlugin : JavaPlugin() {
         getCommand("join")?.setExecutor(JoinCommand(teamDatabaseHandler))
 
         getCommand("leaveteam")?.setExecutor(LeaveTeamCommand(teamDatabaseHandler))
-//
-//        getCommand("resummon")?.setExecutor(ResummonCommand())
-//
-//        getCommand("progress")?.setExecutor(ProgressCommand())
-//
-//        getCommand("missing")?.setExecutor(MissingCommand())
-//
-//        getCommand("globalprogress")?.setExecutor(GlobalProgressCommand())
-//
-//        getCommand("disablebossbar")?.setExecutor(DisableBossBarCommand())
 
+        getCommand("resummon")?.setExecutor(ResummonCommand(teamDatabaseHandler, skullDatabaseHandler, skullController))
+
+        getCommand("progress")?.setExecutor(ProgressCommand(teamDatabaseHandler, skullDatabaseHandler))
+
+        getCommand("missing")?.setExecutor(MissingCommand(teamDatabaseHandler, skullDatabaseHandler))
+
+        getCommand("globalprogress")?.setExecutor(GlobalProgressCommand(teamDatabaseHandler, skullDatabaseHandler))
+
+//        getCommand("disablebossbar")?.setExecutor(DisableBossBarCommand())
     }
 
     private fun registerEventListeners() {

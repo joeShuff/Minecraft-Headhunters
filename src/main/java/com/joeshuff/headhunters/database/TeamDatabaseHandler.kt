@@ -173,4 +173,41 @@ class TeamDatabaseHandler(val plugin: HeadHuntersPlugin, val dbHandler: Database
         }
         return null
     }
+
+    fun getAllTeams(): List<Team> {
+        val connection = dbHandler.getConnection() ?: return emptyList()
+        val query = """
+        SELECT ID, team_name, shrine_world, shrine_x, shrine_y, shrine_z
+        FROM teams
+    """
+        val teams = mutableListOf<Team>()
+
+        try {
+            val statement = connection.prepareStatement(query)
+            val resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val teamId = resultSet.getString("ID")
+                val teamName = resultSet.getString("team_name")
+                val shrineWorldName = resultSet.getString("shrine_world")
+                val shrineX = resultSet.getInt("shrine_x")
+                val shrineY = resultSet.getInt("shrine_y")
+                val shrineZ = resultSet.getInt("shrine_z")
+
+                // Convert shrine information to a Location, if available
+                val shrineLocation = if (shrineWorldName != null) {
+                    val world = Bukkit.getWorld(shrineWorldName)
+                    world?.let { Location(it, shrineX.toDouble(), shrineY.toDouble(), shrineZ.toDouble()) }
+                } else {
+                    null
+                }
+
+                teams.add(Team(teamId, teamName, shrineLocation))
+            }
+        } catch (e: SQLException) {
+            plugin.logger.severe("Error retrieving all teams: ${e.message}")
+        }
+        return teams
+    }
+
 }

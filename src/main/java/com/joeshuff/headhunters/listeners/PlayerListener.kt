@@ -1,7 +1,7 @@
 package com.joeshuff.headhunters.listeners
 
 import com.joeshuff.headhunters.HeadHuntersPlugin
-import com.joeshuff.headhunters.SkullController
+import com.joeshuff.headhunters.util.SkullController
 import com.joeshuff.headhunters.database.SkullDatabaseHandler
 import com.joeshuff.headhunters.database.TeamDatabaseHandler
 import com.joeshuff.headhunters.regions.PlayerEnterRegionEvent
