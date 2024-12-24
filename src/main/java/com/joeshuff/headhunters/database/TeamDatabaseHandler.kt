@@ -174,6 +174,45 @@ class TeamDatabaseHandler(val plugin: HeadHuntersPlugin, val dbHandler: Database
         return null
     }
 
+    fun getTeamByName(queryTeamName: String): Team? {
+        val sql = """
+            SELECT t.ID, t.team_name, t.shrine_world, t.shrine_x, t.shrine_y, t.shrine_z
+            FROM teams t
+            INNER JOIN players p ON p.team_id = t.ID
+            WHERE t.team_name = ?
+        """
+
+        val connection = dbHandler.getConnection() ?: return null
+
+        try {
+            val statement = connection.prepareStatement(sql)
+            statement.setString(1, queryTeamName)
+            val resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                val teamId = resultSet.getString("ID")
+                val teamName = resultSet.getString("team_name")
+                val shrineWorldName = resultSet.getString("shrine_world")
+                val shrineX = resultSet.getInt("shrine_x")
+                val shrineY = resultSet.getInt("shrine_y")
+                val shrineZ = resultSet.getInt("shrine_z")
+
+                // Convert shrine information to a Location, if available
+                val shrineLocation = if (shrineWorldName != null) {
+                    val world = Bukkit.getWorld(shrineWorldName)
+                    world?.let { Location(it, shrineX.toDouble(), shrineY.toDouble(), shrineZ.toDouble()) }
+                } else {
+                    null
+                }
+
+                return Team(teamId, teamName, shrineLocation)
+            }
+        } catch (e: SQLException) {
+            plugin.logger.severe("Error getting team by ID: ${e.message}")
+        }
+        return null
+    }
+
     fun getAllTeams(): List<Team> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
