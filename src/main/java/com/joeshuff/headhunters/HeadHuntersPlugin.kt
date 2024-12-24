@@ -1,9 +1,6 @@
 package com.joeshuff.headhunters
 
-import com.joeshuff.headhunters.commands.skulls.GlobalProgressCommand
-import com.joeshuff.headhunters.commands.skulls.MissingCommand
-import com.joeshuff.headhunters.commands.skulls.ProgressCommand
-import com.joeshuff.headhunters.commands.skulls.ResummonCommand
+import com.joeshuff.headhunters.commands.skulls.*
 import com.joeshuff.headhunters.commands.teams.*
 import com.joeshuff.headhunters.database.DatabaseHandler
 import com.joeshuff.headhunters.database.ShrineDatabaseHandler
@@ -34,12 +31,14 @@ class HeadHuntersPlugin : JavaPlugin() {
     private val bossBarManager = BossBarManager()
 
     override fun onEnable() {
-        saveResource("head_data.json", true)
+        saveResource("skull_data.json", true)
         saveDefaultConfig()
 
         registerCommands()
         registerEventListeners()
         setupTimers()
+
+        shrineDatabaseHandler.initShrines()
 
         logger.info("====================")
         logger.info("HEAD HUNTER PLUGIN LOADED")
@@ -77,7 +76,7 @@ class HeadHuntersPlugin : JavaPlugin() {
 
         getCommand("globalprogress")?.setExecutor(GlobalProgressCommand(teamDatabaseHandler, skullDatabaseHandler))
 
-//        getCommand("disablebossbar")?.setExecutor(DisableBossBarCommand())
+        getCommand("earn")?.setExecutor(EarnCommand(teamDatabaseHandler, skullDatabaseHandler))
     }
 
     private fun registerEventListeners() {

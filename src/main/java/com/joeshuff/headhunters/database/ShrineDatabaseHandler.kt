@@ -12,7 +12,7 @@ class ShrineDatabaseHandler(
     private val regionManager: RegionManager
 ) {
 
-    init {
+    fun initShrines() {
         //Initialise all shrines into memory
         getAllShrines().forEach {
             regionManager.upsertRegion(it.first, it.second, getShrineRadius())
@@ -53,8 +53,7 @@ class ShrineDatabaseHandler(
     fun getAllShrines(): List<Pair<String, Location>> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
-        SELECT ID, shrine_x, shrine_y, shrine_z
-        FROM teams
+        SELECT ID FROM teams
     """
         val shrines = mutableListOf<Pair<String, Location?>>()
 
@@ -64,15 +63,9 @@ class ShrineDatabaseHandler(
 
             while (resultSet.next()) {
                 val teamId = resultSet.getString("ID")
-                val shrineX = resultSet.getInt("shrine_x")
-                val shrineY = resultSet.getInt("shrine_y")
-                val shrineZ = resultSet.getInt("shrine_z")
-                val shrineLocation = if (shrineX != 0 && shrineY != 0 && shrineZ != 0) {
-                    Location(null, shrineX.toDouble(), shrineY.toDouble(), shrineZ.toDouble())
-                } else {
-                    null
-                }
-                shrines.add(Pair(teamId, shrineLocation))
+                val shrine = getShrine(teamId)
+
+                shrines.add(Pair(teamId, shrine))
             }
         } catch (e: SQLException) {
             plugin.logger.severe("Error retrieving shrines from the database: ${e.message}")

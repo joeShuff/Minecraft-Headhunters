@@ -53,8 +53,8 @@ class PlayerListener(
                 val entityType = EntityType.fromName(uncollectedSkull.entityType)?: return@forEach
                 val shrineLoc = playerTeam.shrineLocation?: return@forEach
 
-                skullController.spawnSkullAtLocation(shrineLoc, entityType)
-                skullDatabaseHandler.markSkullCollected(playerTeam.id, entityType)
+                val spawned = skullController.spawnSkullAtLocation(shrineLoc, entityType, uncollectedSkull.earnedBy)
+                if (spawned) skullDatabaseHandler.markSkullCollected(playerTeam.id, entityType)
             }
         }
     }

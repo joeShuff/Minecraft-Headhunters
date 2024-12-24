@@ -18,8 +18,23 @@ class DatabaseHandler(private val plugin: Plugin) {
     // Initialize the database connection and tables
     private fun initializeDatabase() {
         try {
+            // Ensure the plugin's data folder exists
+            val dataFolder = plugin.dataFolder
+            if (!dataFolder.exists()) {
+                if (dataFolder.mkdirs()) {
+                    plugin.logger.info("Plugin data folder created successfully.")
+                } else {
+                    plugin.logger.severe("Failed to create plugin data folder.")
+                    return
+                }
+            }
+
             if (connection == null || connection!!.isClosed) {
-                connection = DriverManager.getConnection(dbUrl)
+                val newConnection = DriverManager.getConnection(dbUrl)
+                newConnection.autoCommit = true
+
+                connection = newConnection
+
                 plugin.logger.info("Database connection established successfully.")
                 createTables()
             }

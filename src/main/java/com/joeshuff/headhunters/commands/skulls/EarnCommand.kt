@@ -14,16 +14,27 @@ class EarnCommand(
     private val skullDatabaseHandler: SkullDatabaseHandler
 ): TabExecutor {
     override fun onTabComplete(
-        p0: CommandSender,
-        p1: Command,
-        p2: String,
-        p3: Array<out String>
-    ): MutableList<String>? {
+        sender: CommandSender,
+        command: Command,
+        alias: String,
+        args: Array<out String>
+    ): List<String>? {
+        if (sender !is Player || args.size != 1) return null
+
+        if (!sender.isOp) return null
+
+        val team = teamDatabaseHandler.getTeamForPlayer(sender) ?: return emptyList()
+
+        val allHeads = skullDatabaseHandler.getSkullData(team.id)
+//        return allHeads.filter { it.earned }
+//            .map { it.entityType.name }
+//            .filter { it.startsWith(args[0], ignoreCase = true) }
+
         return emptyList()
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
-        if (sender !is Player || !sender.isOp()) {
+        if (sender !is Player || !sender.isOp) {
             sender.sendMessage("${ChatColor.RED}You do not have permission to use this command.")
             return true
         }

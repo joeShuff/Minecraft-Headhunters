@@ -2,11 +2,13 @@ package com.joeshuff.headhunters.commands.skulls
 
 import com.joeshuff.headhunters.database.SkullDatabaseHandler
 import com.joeshuff.headhunters.database.TeamDatabaseHandler
+import com.joeshuff.headhunters.util.toDisplayString
 import org.bukkit.command.CommandExecutor
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 
 class MissingCommand(
@@ -41,8 +43,8 @@ class MissingCommand(
 
         if (awaitingCollection.isNotEmpty()) {
             message.append("${ChatColor.GREEN}Awaiting Collection:${ChatColor.RESET}\n")
-            awaitingCollection.forEach { entityType ->
-                message.append("- ${ChatColor.YELLOW}${entityType.lowercase().replace('_', ' ').capitalize()}\n")
+            awaitingCollection.mapNotNull { EntityType.fromName(it) }.forEach { entityType ->
+                message.append("- ${ChatColor.YELLOW}${entityType.toDisplayString() + ChatColor.RESET}\n")
             }
         } else {
             message.append("${ChatColor.GREEN}Awaiting Collection:${ChatColor.GRAY} None\n")
@@ -50,8 +52,8 @@ class MissingCommand(
 
         if (notYetEarned.isNotEmpty()) {
             message.append("${ChatColor.RED}Not yet earned:${ChatColor.RESET}\n")
-            notYetEarned.forEach { entityType ->
-                message.append("- ${ChatColor.YELLOW}${entityType.lowercase().replace('_', ' ').capitalize()}\n")
+            notYetEarned.mapNotNull { EntityType.fromName(it) }.forEach { entityType ->
+                message.append("- ${ChatColor.YELLOW}${entityType.toDisplayString() + ChatColor.RESET}\n")
             }
         } else {
             message.append("${ChatColor.RED}Not yet earned:${ChatColor.GRAY} None\n")

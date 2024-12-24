@@ -72,7 +72,7 @@ class ResummonCommand(
             return true
         }
 
-        skullController.spawnSkullAtLocation(shrineLocation, entityType)
+        skullController.spawnSkullAtLocation(shrineLocation, entityType, earnedHead.earnedBy)
         sender.sendMessage("§aThe skull for '${earnedHead.entityType}' has been resummoned at your team's shrine.")
         return true
     }

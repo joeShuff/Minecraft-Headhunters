@@ -2,10 +2,9 @@ package com.joeshuff.headhunters.database
 
 import com.joeshuff.headhunters.HeadHuntersPlugin
 import com.joeshuff.headhunters.data.models.SkullData
-import org.bukkit.entity.Player
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import java.sql.SQLException
-import java.sql.Timestamp
 import java.util.Collections.emptyList
 
 class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val dbHandler: DatabaseHandler) {
