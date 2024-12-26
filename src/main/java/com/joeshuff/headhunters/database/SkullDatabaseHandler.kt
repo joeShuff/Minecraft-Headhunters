@@ -1,18 +1,40 @@
 package com.joeshuff.headhunters.database
 
+import com.google.gson.Gson
 import com.joeshuff.headhunters.HeadHuntersPlugin
-import com.joeshuff.headhunters.data.models.SkullData
+import com.joeshuff.headhunters.data.models.SkullSourceData
+import com.joeshuff.headhunters.data.models.SkullTrackingData
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import java.io.File
 import java.sql.SQLException
 import java.util.Collections.emptyList
+
+
 
 class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val dbHandler: DatabaseHandler) {
 
     // Seed the skulls for a team (add all entity types to track)
     fun seedTeam(teamId: String): Boolean {
         val connection = dbHandler.getConnection() ?: return false
-        val entityTypes = EntityType.values().filter { it.isAlive }
+
+        val skullDataFile = File(plugin.dataFolder, "skull_data.json")
+
+        if (!skullDataFile.exists()) {
+            plugin.logger.severe("Skull data file not found at ${skullDataFile.path}. Ensure it exists and is properly formatted.")
+            return false
+        }
+
+        val skullData: List<SkullSourceData> = try {
+            val gson = Gson()
+            skullDataFile.bufferedReader().use { reader ->
+                gson.fromJson(reader, Array<SkullSourceData>::class.java).toList()
+            }
+        } catch (e: Exception) {
+            plugin.logger.severe("Error reading skull_data.json: ${e.message}")
+            return false
+        }
+
         val insertQuery = """
             INSERT INTO skulls (team_id, entity_type, earned, collected)
             VALUES (?, ?, false, false)
@@ -21,9 +43,9 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
             val statement = connection.prepareStatement(insertQuery)
             connection.autoCommit = false // Ensure it's done in a single transaction
 
-            entityTypes.forEach { entityType ->
+            skullData.forEach { skull ->
                 statement.setString(1, teamId)
-                statement.setString(2, entityType.name)
+                statement.setString(2, skull.entityType)
                 statement.addBatch()
             }
 
@@ -127,21 +149,21 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
     }
 
     // Get the skull data for a team (returns a list of all skull records for the team)
-    fun getSkullData(teamId: String): List<SkullData> {
+    fun getSkullData(teamId: String): List<SkullTrackingData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
             SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected
             FROM skulls
             WHERE team_id = ?
         """
-        val skullDataList = mutableListOf<SkullData>()
+        val skullDataList = mutableListOf<SkullTrackingData>()
         try {
             val statement = connection.prepareStatement(query)
             statement.setString(1, teamId)
             val resultSet = statement.executeQuery()
 
             while (resultSet.next()) {
-                val skullData = SkullData(
+                val skullData = SkullTrackingData(
                     id = resultSet.getInt("id"),
                     teamId = resultSet.getString("team_id"),
                     entityType = resultSet.getString("entity_type"),
@@ -158,21 +180,21 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
         return skullDataList
     }
 
-    fun getEarnedButNotCollectedSkulls(teamId: String): List<SkullData> {
+    fun getEarnedButNotCollectedSkulls(teamId: String): List<SkullTrackingData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
         SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected
         FROM skulls
         WHERE team_id = ? AND earned = true AND collected = false
     """
-        val skullDataList = mutableListOf<SkullData>()
+        val skullDataList = mutableListOf<SkullTrackingData>()
         try {
             val statement = connection.prepareStatement(query)
             statement.setString(1, teamId)
             val resultSet = statement.executeQuery()
 
             while (resultSet.next()) {
-                val skullData = SkullData(
+                val skullData = SkullTrackingData(
                     id = resultSet.getInt("id"),
                     teamId = resultSet.getString("team_id"),
                     entityType = resultSet.getString("entity_type"),

@@ -66,6 +66,8 @@ class HeadHuntersPlugin : JavaPlugin() {
 
         getCommand("join")?.setExecutor(JoinCommand(teamDatabaseHandler))
 
+        getCommand("teams")?.setExecutor(ListTeamsCommand(teamDatabaseHandler))
+
         getCommand("leaveteam")?.setExecutor(LeaveTeamCommand(teamDatabaseHandler))
 
         getCommand("resummon")?.setExecutor(ResummonCommand(teamDatabaseHandler, skullDatabaseHandler, skullController))

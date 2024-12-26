@@ -3,6 +3,7 @@ package com.joeshuff.headhunters.util
 import com.destroystokyo.paper.profile.ProfileProperty
 import com.google.gson.Gson
 import com.joeshuff.headhunters.HeadHuntersPlugin
+import com.joeshuff.headhunters.data.models.SkullSourceData
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import org.bukkit.*
@@ -15,14 +16,7 @@ import java.util.*
 
 class SkullController(val plugin: HeadHuntersPlugin) {
 
-    data class SkullData(
-        val entityType: String,
-        val name: String,
-        val skullTexture: String,
-        val variation: String
-    )
-
-    val skullTextures = mutableMapOf<EntityType, SkullData>()
+    val skullTextures = mutableMapOf<EntityType, SkullSourceData>()
 
     init {
         loadSkullData()
@@ -32,7 +26,7 @@ class SkullController(val plugin: HeadHuntersPlugin) {
         try {
             val resourceStream = plugin.getResource("skull_data.json")
             val reader = InputStreamReader(resourceStream)
-            val skullDataList = Gson().fromJson(reader, Array<SkullData>::class.java)
+            val skullDataList = Gson().fromJson(reader, Array<SkullSourceData>::class.java)
             skullDataList.forEach { skullData ->
                 val entityType = EntityType.fromName(skullData.entityType) ?: return@forEach
                 skullTextures[entityType] = skullData
@@ -45,7 +39,7 @@ class SkullController(val plugin: HeadHuntersPlugin) {
     // Get the skull texture for an EntityType
     fun getSkullTextureForEntityType(entityType: EntityType): String? {
         val skullData = skullTextures[entityType]
-        return skullData?.skullTexture
+        return skullData?.textures
     }
 
     fun getSkullTypeVanilla(entityType: EntityType): Material {

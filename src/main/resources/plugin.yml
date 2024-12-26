@@ -32,10 +32,13 @@ commands:
     usage: /<command> <player>
   join:
     description: Join a team
-    usage: /<command> <team_guid>
+    usage: /<command> <team_guid> <player_name>
   leaveteam:
     description: Leave your current team.
     usage: /leaveteam
   earn:
     description: Force earn a skull
     usage: /earn <mob_name>
+  teams:
+    description: List all teams
+    usage: /teams

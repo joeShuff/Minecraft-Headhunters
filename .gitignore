@@ -111,3 +111,7 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+input.csv
+
+output.json

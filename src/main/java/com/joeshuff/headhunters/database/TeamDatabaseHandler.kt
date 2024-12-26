@@ -139,7 +139,6 @@ class TeamDatabaseHandler(val plugin: HeadHuntersPlugin, val dbHandler: Database
         val sql = """
             SELECT t.ID, t.team_name, t.shrine_world, t.shrine_x, t.shrine_y, t.shrine_z
             FROM teams t
-            INNER JOIN players p ON p.team_id = t.ID
             WHERE t.ID = ?
         """
 
