@@ -1,6 +1,6 @@
 package com.joeshuff.headhunters.data.models
 
-data class SkullTrackingData(
+data class SkullDBData(
         val id: Int,
         val teamId: String,
         val entityType: String, // String representation of the EntityType

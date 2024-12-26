@@ -54,8 +54,7 @@ class SkullController(val plugin: HeadHuntersPlugin) {
         }
     }
 
-    // Method to spawn a skull at a specific location matching the EntityType
-    fun spawnSkullAtLocation(location: Location, entityType: EntityType, earnedPlayerUUID: String?): Boolean {
+    fun getSkullItemStack(entityType: EntityType, earnedPlayerUUID: String?): ItemStack? {
         val skullTexture = getSkullTextureForEntityType(entityType)
         val skullMaterial = getSkullTypeVanilla(entityType)
 
@@ -66,12 +65,11 @@ class SkullController(val plugin: HeadHuntersPlugin) {
         if (skullMaterial == Material.PLAYER_HEAD) {
             if (skullTexture == null) {
                 plugin.logger.severe("No texture data for $entityType")
-                return false
+                return null
             }
 
             val uuid = UUID.randomUUID()
             val profile = Bukkit.createProfile(uuid, uuid.toString().substring(0, 16))
-            plugin.logger.info("texture for $entityType is $skullTexture")
 
             // Apply the texture using the Property class from authlib
             profile.setProperty(ProfileProperty("textures", skullTexture))
@@ -100,8 +98,28 @@ class SkullController(val plugin: HeadHuntersPlugin) {
 
         skull.itemMeta = skullMeta // Set the updated meta back to the skull item
 
+        return skull
+    }
+
+    fun spawnSkullAtLocation(itemStack: ItemStack, location: Location) {
         // Spawn the skull at the location
-        location.world?.dropItem(location, skull)
-        return true
+        val droppedItem = location.world?.dropItem(location, itemStack)
+
+        droppedItem?.apply {
+            isGlowing = true
+            isPersistent = true // Prevent item from despawning
+            fireTicks = 0 // Ensure the item isn't burning
+            isInvulnerable = true // Make it invulnerable to fire damage
+        }
+    }
+
+    // Method to spawn a skull at a specific location matching the EntityType
+    fun spawnSkullForEntityType(location: Location, entityType: EntityType, earnedPlayerUUID: String?): Boolean {
+        val skullItemStack = getSkullItemStack(entityType, earnedPlayerUUID)
+
+        skullItemStack?.let {
+            spawnSkullAtLocation(skullItemStack, location)
+            return true
+        }?: return false
     }
 }

@@ -35,15 +35,8 @@ class PlayerListener(
     }
 
     @EventHandler
-    fun onPlayerLeaveRegion(event: PlayerLeaveRegionEvent) {
-        event.player.sendMessage("You have left region ${event.regionId}")
-    }
-
-    @EventHandler
     fun onPlayerEnterRegion(event: PlayerEnterRegionEvent) {
         val playerTeam = teamDatabaseHandler.getTeamForPlayer(event.player)?: return
-
-        event.player.sendMessage("You have entered region ${event.regionId}")
 
         //Check that player entered their own teams region
         if (playerTeam.id == event.regionId) {
@@ -53,7 +46,7 @@ class PlayerListener(
                 val entityType = EntityType.fromName(uncollectedSkull.entityType)?: return@forEach
                 val shrineLoc = playerTeam.shrineLocation?: return@forEach
 
-                val spawned = skullController.spawnSkullAtLocation(shrineLoc, entityType, uncollectedSkull.earnedBy)
+                val spawned = skullController.spawnSkullForEntityType(shrineLoc, entityType, uncollectedSkull.earnedBy)
                 if (spawned) skullDatabaseHandler.markSkullCollected(playerTeam.id, entityType)
             }
         }

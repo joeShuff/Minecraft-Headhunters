@@ -3,7 +3,7 @@ package com.joeshuff.headhunters.database
 import com.google.gson.Gson
 import com.joeshuff.headhunters.HeadHuntersPlugin
 import com.joeshuff.headhunters.data.models.SkullSourceData
-import com.joeshuff.headhunters.data.models.SkullTrackingData
+import com.joeshuff.headhunters.data.models.SkullDBData
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import java.io.File
@@ -149,21 +149,21 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
     }
 
     // Get the skull data for a team (returns a list of all skull records for the team)
-    fun getSkullData(teamId: String): List<SkullTrackingData> {
+    fun getSkullData(teamId: String): List<SkullDBData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
             SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected
             FROM skulls
             WHERE team_id = ?
         """
-        val skullDataList = mutableListOf<SkullTrackingData>()
+        val skullDataList = mutableListOf<SkullDBData>()
         try {
             val statement = connection.prepareStatement(query)
             statement.setString(1, teamId)
             val resultSet = statement.executeQuery()
 
             while (resultSet.next()) {
-                val skullData = SkullTrackingData(
+                val skullData = SkullDBData(
                     id = resultSet.getInt("id"),
                     teamId = resultSet.getString("team_id"),
                     entityType = resultSet.getString("entity_type"),
@@ -180,21 +180,21 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
         return skullDataList
     }
 
-    fun getEarnedButNotCollectedSkulls(teamId: String): List<SkullTrackingData> {
+    fun getEarnedButNotCollectedSkulls(teamId: String): List<SkullDBData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
         SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected
         FROM skulls
         WHERE team_id = ? AND earned = true AND collected = false
     """
-        val skullDataList = mutableListOf<SkullTrackingData>()
+        val skullDataList = mutableListOf<SkullDBData>()
         try {
             val statement = connection.prepareStatement(query)
             statement.setString(1, teamId)
             val resultSet = statement.executeQuery()
 
             while (resultSet.next()) {
-                val skullData = SkullTrackingData(
+                val skullData = SkullDBData(
                     id = resultSet.getInt("id"),
                     teamId = resultSet.getString("team_id"),
                     entityType = resultSet.getString("entity_type"),

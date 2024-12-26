@@ -70,7 +70,14 @@ class HeadHuntersPlugin : JavaPlugin() {
 
         getCommand("leaveteam")?.setExecutor(LeaveTeamCommand(teamDatabaseHandler))
 
-        getCommand("resummon")?.setExecutor(ResummonCommand(teamDatabaseHandler, skullDatabaseHandler, skullController))
+        getCommand("resummon")?.setExecutor(
+            ResummonCommand(
+                this,
+                teamDatabaseHandler,
+                skullDatabaseHandler,
+                skullController
+            )
+        )
 
         getCommand("progress")?.setExecutor(ProgressCommand(teamDatabaseHandler, skullDatabaseHandler))
 
