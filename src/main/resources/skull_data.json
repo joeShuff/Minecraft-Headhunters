@@ -1,5 +1,30 @@
 [
   {
+    "entityType": "SKELETON",
+    "skullTexture": "",
+    "variations": []
+  },
+  {
+    "entityType": "ZOMBIE",
+    "skullTexture": "",
+    "variations": []
+  },
+  {
+    "entityType": "CREEPER",
+    "skullTexture": "",
+    "variations": []
+  },
+  {
+    "entityType": "WITHER_SKELETON",
+    "skullTexture": "",
+    "variations": []
+  },
+  {
+    "entityType": "ENDER_DRAGON",
+    "skullTexture": "",
+    "variations": []
+  },
+  {
     "entityType": "ELDER_GUARDIAN",
     "skullTexture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGEyZDY0ZjRhMDBlOWM4NWY2NzI2MmVkY2FjYjg0NTIzNTgxYWUwZjM3YmRhYjIyZGQ3MDQ1MjRmNjJlMTY5ZiJ9fX0=",
     "variations": []

@@ -11,7 +11,6 @@ import java.sql.SQLException
 import java.util.Collections.emptyList
 
 
-
 class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val dbHandler: DatabaseHandler) {
 
     // Seed the skulls for a team (add all entity types to track)
@@ -58,20 +57,20 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
         return false
     }
 
-    // Mark a skull as earned, setting the earned flag and earned_by/earned_at fields
-    fun markSkullEarned(teamId: String, player: Player, entityType: EntityType): Boolean {
+    fun markSkullEarned(teamId: String, player: Player, entityType: EntityType, killedInfo: String? = null): Boolean {
         val connection = dbHandler.getConnection() ?: return false
         val updateQuery = """
-            UPDATE skulls
-            SET earned = true, earned_by = ?, earned_at = ?
-            WHERE team_id = ? AND entity_type = ? AND earned = false
-        """
+        UPDATE skulls
+        SET earned = true, earned_by = ?, earned_at = ?, killed_info = ?
+        WHERE team_id = ? AND entity_type = ? AND earned = false
+    """
         try {
             val statement = connection.prepareStatement(updateQuery)
-            statement.setString(1, player.uniqueId.toString())
-            statement.setLong(2, System.currentTimeMillis())
-            statement.setString(3, teamId)
-            statement.setString(4, entityType.name)
+            statement.setString(1, player.uniqueId.toString()) // Set the player who earned the skull
+            statement.setLong(2, System.currentTimeMillis()) // Set the time when the skull was earned
+            statement.setString(3, killedInfo) // Set the killed info, defaulting to "Unknown" if null
+            statement.setString(4, teamId) // Set the team ID
+            statement.setString(5, entityType.name) // Set the entity type
 
             val rowsAffected = statement.executeUpdate()
             return rowsAffected > 0
@@ -152,7 +151,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
     fun getSkullData(teamId: String): List<SkullDBData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
-            SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected
+            SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected, killed_info
             FROM skulls
             WHERE team_id = ?
         """
@@ -170,7 +169,8 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
                     earned = resultSet.getBoolean("earned"),
                     earnedBy = resultSet.getString("earned_by"),
                     earnedAt = resultSet.getLong("earned_at"),
-                    collected = resultSet.getBoolean("collected")
+                    collected = resultSet.getBoolean("collected"),
+                    killedInfo = resultSet.getString("killed_info")
                 )
                 skullDataList.add(skullData)
             }
@@ -183,7 +183,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
     fun getEarnedButNotCollectedSkulls(teamId: String): List<SkullDBData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
-        SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected
+        SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected, killed_info
         FROM skulls
         WHERE team_id = ? AND earned = true AND collected = false
     """
@@ -201,7 +201,8 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
                     earned = resultSet.getBoolean("earned"),
                     earnedBy = resultSet.getString("earned_by"),
                     earnedAt = resultSet.getLong("earned_at"),
-                    collected = resultSet.getBoolean("collected")
+                    collected = resultSet.getBoolean("collected"),
+                    killedInfo = resultSet.getString("killed_info")
                 )
                 skullDataList.add(skullData)
             }

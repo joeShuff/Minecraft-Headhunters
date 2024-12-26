@@ -74,7 +74,7 @@ class ResummonCommand(
         var inventorySlot = 1 // Start at column 2 (skipping the first column)
         for (skullData in currentSkulls) {
             val entityType = EntityType.fromName(skullData.entityType) ?: continue
-            val item = skullController.getSkullItemStack(entityType, skullData.earnedBy)
+            val item = skullController.getSkullItemStack(entityType, skullData.earnedBy, skullData.killedInfo)
 
             inventory.setItem(inventorySlot, item)
 

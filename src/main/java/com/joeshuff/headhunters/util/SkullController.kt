@@ -3,6 +3,7 @@ package com.joeshuff.headhunters.util
 import com.destroystokyo.paper.profile.ProfileProperty
 import com.google.gson.Gson
 import com.joeshuff.headhunters.HeadHuntersPlugin
+import com.joeshuff.headhunters.data.models.SkullDBData
 import com.joeshuff.headhunters.data.models.SkullSourceData
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
@@ -54,7 +55,7 @@ class SkullController(val plugin: HeadHuntersPlugin) {
         }
     }
 
-    fun getSkullItemStack(entityType: EntityType, earnedPlayerUUID: String?): ItemStack? {
+    fun getSkullItemStack(entityType: EntityType, earnedPlayerUUID: String?, killedInfo: String? = null): ItemStack? {
         val skullTexture = getSkullTextureForEntityType(entityType)
         val skullMaterial = getSkullTypeVanilla(entityType)
 
@@ -62,18 +63,33 @@ class SkullController(val plugin: HeadHuntersPlugin) {
 
         val skullMeta = skull.itemMeta as SkullMeta // Get the meta for the skull
 
+        // Set the display name
+        val displayName = "${ChatColor.DARK_GREEN}${entityType.toDisplayString()} Skull"
+        skullMeta.setDisplayName(displayName)
+
         if (skullMaterial == Material.PLAYER_HEAD) {
-            if (skullTexture == null) {
-                plugin.logger.severe("No texture data for $entityType")
-                return null
+            if (entityType == EntityType.PLAYER) {
+                killedInfo?.let {
+                    val player = Bukkit.getOfflinePlayer(UUID.fromString(killedInfo))
+                    skullMeta.owningPlayer = player
+
+                    // Set the display name
+                    val displayName = "${ChatColor.DARK_GREEN}${player.name}'s Skull"
+                    skullMeta.setDisplayName(displayName)
+                }
+            } else {
+                if (skullTexture == null) {
+                    plugin.logger.severe("No texture data for $entityType")
+                    return null
+                }
+
+                val uuid = UUID.randomUUID()
+                val profile = Bukkit.createProfile(uuid, uuid.toString().substring(0, 16))
+
+                // Apply the texture using the Property class from authlib
+                profile.setProperty(ProfileProperty("textures", skullTexture))
+                skullMeta.playerProfile = profile
             }
-
-            val uuid = UUID.randomUUID()
-            val profile = Bukkit.createProfile(uuid, uuid.toString().substring(0, 16))
-
-            // Apply the texture using the Property class from authlib
-            profile.setProperty(ProfileProperty("textures", skullTexture))
-            skullMeta.playerProfile = profile
         }
 
         val lore = mutableListOf<String>()
@@ -84,10 +100,6 @@ class SkullController(val plugin: HeadHuntersPlugin) {
             "${ChatColor.GOLD}Headhunted bravely"
         }
         lore.add(description)
-
-        // Set the display name
-        val displayName = "${ChatColor.DARK_GREEN}${entityType.toDisplayString()} Skull"
-        skullMeta.setDisplayName(displayName)
 
         skullMeta.lore = lore
 
@@ -114,12 +126,13 @@ class SkullController(val plugin: HeadHuntersPlugin) {
     }
 
     // Method to spawn a skull at a specific location matching the EntityType
-    fun spawnSkullForEntityType(location: Location, entityType: EntityType, earnedPlayerUUID: String?): Boolean {
-        val skullItemStack = getSkullItemStack(entityType, earnedPlayerUUID)
+    fun spawnSkullForEntityType(location: Location, skullDBData: SkullDBData): Boolean {
+        val entityType = EntityType.fromName(skullDBData.entityType)?: return false
+        val skullItemStack = getSkullItemStack(entityType, skullDBData.earnedBy, skullDBData.killedInfo)
 
         skullItemStack?.let {
             spawnSkullAtLocation(skullItemStack, location)
             return true
-        }?: return false
+        } ?: return false
     }
 }

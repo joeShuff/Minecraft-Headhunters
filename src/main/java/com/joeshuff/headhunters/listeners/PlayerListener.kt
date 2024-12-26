@@ -14,7 +14,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
 
 class PlayerListener(
-    private val plugin: HeadHuntersPlugin,
+    plugin: HeadHuntersPlugin,
     private val regionManager: RegionManager,
     private val teamDatabaseHandler: TeamDatabaseHandler,
     private val skullDatabaseHandler: SkullDatabaseHandler,
@@ -46,7 +46,7 @@ class PlayerListener(
                 val entityType = EntityType.fromName(uncollectedSkull.entityType)?: return@forEach
                 val shrineLoc = playerTeam.shrineLocation?: return@forEach
 
-                val spawned = skullController.spawnSkullForEntityType(shrineLoc, entityType, uncollectedSkull.earnedBy)
+                val spawned = skullController.spawnSkullForEntityType(shrineLoc, uncollectedSkull)
                 if (spawned) skullDatabaseHandler.markSkullCollected(playerTeam.id, entityType)
             }
         }
