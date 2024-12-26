@@ -39,7 +39,7 @@ class SkullController(val plugin: HeadHuntersPlugin) {
     // Get the skull texture for an EntityType
     fun getSkullTextureForEntityType(entityType: EntityType): String? {
         val skullData = skullTextures[entityType]
-        return skullData?.textures
+        return skullData?.skullTexture
     }
 
     fun getSkullTypeVanilla(entityType: EntityType): Material {

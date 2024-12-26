@@ -12,7 +12,7 @@ data class SkullTrackingData(
 
 data class SkullSourceData(
         val entityType: String,
-        val textures: String,
+        val skullTexture: String,
         val variations: List<SkullSourceVariation>
 )
 
