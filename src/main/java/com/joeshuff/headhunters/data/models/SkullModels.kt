@@ -14,7 +14,8 @@ data class SkullDBData(
 data class SkullSourceData(
         val entityType: String,
         val skullTexture: String,
-        val variations: List<SkullSourceVariation>
+        val variations: List<SkullSourceVariation>,
+        val category: String?
 )
 
 data class SkullSourceVariation(
