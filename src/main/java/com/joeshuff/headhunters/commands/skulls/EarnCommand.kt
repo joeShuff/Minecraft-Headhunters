@@ -75,8 +75,13 @@ class EarnCommand(
             return true
         }
 
+        val providedVariation =
+            if (args.size > 2) {
+                args.getOrNull(2)
+            } else null
+
         // Mark the skull as earned for the team
-        val success = skullDatabaseHandler.markSkullEarned(teamName, sender, entityType)
+        val success = skullDatabaseHandler.markSkullEarned(teamName, sender, entityType, providedVariation)
 
         if (success) {
             sender.sendMessage("${ChatColor.GREEN}The ${entityType.name} skull has been marked as earned for team '$teamName'.")

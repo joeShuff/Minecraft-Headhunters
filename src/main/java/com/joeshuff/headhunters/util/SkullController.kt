@@ -5,8 +5,7 @@ import com.google.gson.Gson
 import com.joeshuff.headhunters.HeadHuntersPlugin
 import com.joeshuff.headhunters.data.models.SkullDBData
 import com.joeshuff.headhunters.data.models.SkullSourceData
-import com.mojang.authlib.GameProfile
-import com.mojang.authlib.properties.Property
+import com.joeshuff.headhunters.variations.VariationFactory
 import org.bukkit.*
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
@@ -55,29 +54,29 @@ class SkullController(val plugin: HeadHuntersPlugin) {
         }
     }
 
-    fun getSkullItemStack(entityType: EntityType, earnedPlayerUUID: String?, killedInfo: String? = null): ItemStack? {
+    fun getSkullItemStack(
+        entityType: EntityType,
+        earnedPlayerUUID: String?,
+        earnedVariation: String? = null
+    ): ItemStack? {
         val skullTexture = getSkullTextureForEntityType(entityType)
         val skullMaterial = getSkullTypeVanilla(entityType)
 
-        val skull = ItemStack(skullMaterial) // Create a player skull item
+        var skull = ItemStack(skullMaterial) // Create a player skull item
 
         val skullMeta = skull.itemMeta as SkullMeta // Get the meta for the skull
 
         // Set the display name
         val displayName = "${ChatColor.DARK_GREEN}${entityType.toDisplayString()} Skull"
         skullMeta.setDisplayName(displayName)
+        skull.itemMeta = skullMeta
 
         if (skullMaterial == Material.PLAYER_HEAD) {
-            if (entityType == EntityType.PLAYER) {
-                killedInfo?.let {
-                    val player = Bukkit.getOfflinePlayer(UUID.fromString(killedInfo))
-                    skullMeta.owningPlayer = player
+            VariationFactory.getHandler(entityType)?.applyVariationToStack(skull, earnedVariation)?.let {
+                skull = it
+            }
 
-                    // Set the display name
-                    val displayName = "${ChatColor.DARK_GREEN}${player.name}'s Skull"
-                    skullMeta.setDisplayName(displayName)
-                }
-            } else {
+            if (entityType != EntityType.PLAYER) {
                 if (skullTexture == null) {
                     plugin.logger.severe("No texture data for $entityType")
                     return null
@@ -127,8 +126,8 @@ class SkullController(val plugin: HeadHuntersPlugin) {
 
     // Method to spawn a skull at a specific location matching the EntityType
     fun spawnSkullForEntityType(location: Location, skullDBData: SkullDBData): Boolean {
-        val entityType = EntityType.fromName(skullDBData.entityType)?: return false
-        val skullItemStack = getSkullItemStack(entityType, skullDBData.earnedBy, skullDBData.killedInfo)
+        val entityType = EntityType.fromName(skullDBData.entityType) ?: return false
+        val skullItemStack = getSkullItemStack(entityType, skullDBData.earnedBy, skullDBData.earnedVariation)
 
         skullItemStack?.let {
             spawnSkullAtLocation(skullItemStack, location)

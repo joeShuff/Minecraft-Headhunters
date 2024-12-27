@@ -3,10 +3,9 @@ package com.joeshuff.headhunters.listeners
 import com.joeshuff.headhunters.HeadHuntersPlugin
 import com.joeshuff.headhunters.database.SkullDatabaseHandler
 import com.joeshuff.headhunters.database.TeamDatabaseHandler
+import com.joeshuff.headhunters.variations.VariationFactory
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -25,8 +24,12 @@ class SkullEarnedListener(
         plugin.server.pluginManager.registerEvents(this, plugin)
     }
 
-    private fun playerKilledEntity(killer: Player, entityType: EntityType, killedExtraDetails: String?) {
+    private fun playerKilledEntity(killer: Player, entity: LivingEntity) {
         val playerTeam = teamDatabaseHandler.getTeamForPlayer(killer) ?: return  // Check if the player is on a team
+
+        val entityType = entity.type
+
+        val variationInfo = VariationFactory.getHandler(entityType)?.extractVariation(entity)
 
         if (skullDatabaseHandler.isSkullEarned(playerTeam.id, entityType)) {
             return  // EntityType is already earned for this team
@@ -37,7 +40,7 @@ class SkullEarnedListener(
             teamId = playerTeam.id,
             player = killer,
             entityType = entityType,
-            killedInfo = killedExtraDetails
+            earnedVariation = variationInfo
         )
 
         if (markedAsEarned) {
@@ -56,7 +59,7 @@ class SkullEarnedListener(
         val victim = event.entity
         val killer = victim.killer ?: return // Only award skulls if a player killed them
 
-        playerKilledEntity(killer, EntityType.PLAYER, victim.uniqueId.toString())
+        playerKilledEntity(killer, victim)
     }
 
     @EventHandler
@@ -64,14 +67,7 @@ class SkullEarnedListener(
         val entity = event.entity
         val killer = entity.killer ?: return  // Only handle kills by players
 
-        playerKilledEntity(killer, entity.type, getExtraDetailsFromEntityType(entity))
-    }
-
-    private fun getExtraDetailsFromEntityType(entity: LivingEntity): String? {
-        return when (entity.type) {
-            EntityType.CAT -> null
-            else -> null
-        }
+        playerKilledEntity(killer, entity)
     }
 
     override fun stop() {

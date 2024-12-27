@@ -11,7 +11,7 @@ class BossBarManager {
 
     fun updateBossBar(player: Player, title: String, progress: Double) {
         val bossBar = playerBossBars.computeIfAbsent(player) {
-            Bukkit.createBossBar(title, BarColor.GREEN, BarStyle.SEGMENTED_10)
+            Bukkit.createBossBar(title, BarColor.GREEN, BarStyle.SEGMENTED_20)
         }
 
         bossBar.setTitle(title)

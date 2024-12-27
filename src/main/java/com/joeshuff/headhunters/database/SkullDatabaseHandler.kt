@@ -57,18 +57,18 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
         return false
     }
 
-    fun markSkullEarned(teamId: String, player: Player, entityType: EntityType, killedInfo: String? = null): Boolean {
+    fun markSkullEarned(teamId: String, player: Player, entityType: EntityType, earnedVariation: String? = null): Boolean {
         val connection = dbHandler.getConnection() ?: return false
         val updateQuery = """
         UPDATE skulls
-        SET earned = true, earned_by = ?, earned_at = ?, killed_info = ?
+        SET earned = true, earned_by = ?, earned_at = ?, earned_variation = ?
         WHERE team_id = ? AND entity_type = ? AND earned = false
     """
         try {
             val statement = connection.prepareStatement(updateQuery)
             statement.setString(1, player.uniqueId.toString()) // Set the player who earned the skull
             statement.setLong(2, System.currentTimeMillis()) // Set the time when the skull was earned
-            statement.setString(3, killedInfo) // Set the killed info, defaulting to "Unknown" if null
+            statement.setString(3, earnedVariation) // Set the variation that was killed
             statement.setString(4, teamId) // Set the team ID
             statement.setString(5, entityType.name) // Set the entity type
 
@@ -151,7 +151,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
     fun getSkullData(teamId: String): List<SkullDBData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
-            SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected, killed_info
+            SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected, earned_variation
             FROM skulls
             WHERE team_id = ?
         """
@@ -170,7 +170,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
                     earnedBy = resultSet.getString("earned_by"),
                     earnedAt = resultSet.getLong("earned_at"),
                     collected = resultSet.getBoolean("collected"),
-                    killedInfo = resultSet.getString("killed_info")
+                    earnedVariation = resultSet.getString("earned_variation")
                 )
                 skullDataList.add(skullData)
             }
@@ -183,7 +183,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
     fun getEarnedButNotCollectedSkulls(teamId: String): List<SkullDBData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
-        SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected, killed_info
+        SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected, earned_variation
         FROM skulls
         WHERE team_id = ? AND earned = true AND collected = false
     """
@@ -202,7 +202,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
                     earnedBy = resultSet.getString("earned_by"),
                     earnedAt = resultSet.getLong("earned_at"),
                     collected = resultSet.getBoolean("collected"),
-                    killedInfo = resultSet.getString("killed_info")
+                    earnedVariation = resultSet.getString("earned_variation")
                 )
                 skullDataList.add(skullData)
             }

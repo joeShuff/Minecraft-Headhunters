@@ -8,7 +8,7 @@ data class SkullDBData(
         val earnedBy: String?,  // UUID of the player who earned the skull
         val earnedAt: Long?,    // Timestamp of when it was earned
         val collected: Boolean,  // Whether the skull has been collected
-        val killedInfo: String? //Info about the entity that got killed
+        val earnedVariation: String? //Info about the entity that got killed
 )
 
 data class SkullSourceData(
