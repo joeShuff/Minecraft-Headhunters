@@ -24,9 +24,6 @@ commands:
   globalprogress:
     description: View the global progress of all teams.
     usage: /<command>
-  disablebossbar:
-    description: Disable the boss bar globally (admin only).
-    usage: /<command>
   invite:
     description: Invite a player to your team
     usage: /<command> <player>
@@ -37,8 +34,8 @@ commands:
     description: Leave your current team.
     usage: /leaveteam
   earn:
-    description: Force earn a skull
-    usage: /earn <mob_name>
+    description: Force earn a skull (Admin Only)
+    usage: /earn <mob_name> <team_id>
   teams:
-    description: List all teams
+    description: List all teams (Admin Only)
     usage: /teams

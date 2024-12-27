@@ -9,6 +9,7 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
+import java.util.*
 
 class JoinCommand(private val teamDatabaseHandler: TeamDatabaseHandler) : TabExecutor {
 
@@ -75,6 +76,10 @@ class JoinCommand(private val teamDatabaseHandler: TeamDatabaseHandler) : TabExe
         }
 
         // Add player to the team
+        teamDatabaseHandler.getPlayerGuidsForTeam(team.id).forEach {
+            Bukkit.getPlayer(it)?.sendMessage("${ChatColor.AQUA}${player.name} ${ChatColor.GREEN}has joined your team.")
+        }
+
         teamDatabaseHandler.addPlayerToTeam(player, team.id)
 
         player.sendMessage(TextComponent("You have successfully joined the team '${team.teamName}'.").apply {

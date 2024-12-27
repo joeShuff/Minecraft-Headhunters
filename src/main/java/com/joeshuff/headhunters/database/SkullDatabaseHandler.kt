@@ -2,26 +2,22 @@ package com.joeshuff.headhunters.database
 
 import com.google.gson.Gson
 import com.joeshuff.headhunters.HeadHuntersPlugin
-import com.joeshuff.headhunters.data.models.SkullSourceData
 import com.joeshuff.headhunters.data.models.SkullDBData
+import com.joeshuff.headhunters.data.models.SkullSourceData
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import java.io.File
 import java.sql.SQLException
-import java.util.Collections.emptyList
 
 
 class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val dbHandler: DatabaseHandler) {
 
-    // Seed the skulls for a team (add all entity types to track)
-    fun seedTeam(teamId: String): Boolean {
-        val connection = dbHandler.getConnection() ?: return false
-
+    fun getRawSkullData(): List<SkullSourceData> {
         val skullDataFile = File(plugin.dataFolder, "skull_data.json")
 
         if (!skullDataFile.exists()) {
             plugin.logger.severe("Skull data file not found at ${skullDataFile.path}. Ensure it exists and is properly formatted.")
-            return false
+            return emptyList()
         }
 
         val skullData: List<SkullSourceData> = try {
@@ -31,8 +27,17 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
             }
         } catch (e: Exception) {
             plugin.logger.severe("Error reading skull_data.json: ${e.message}")
-            return false
+            return emptyList()
         }
+
+        return skullData
+    }
+
+    // Seed the skulls for a team (add all entity types to track)
+    fun seedTeam(teamId: String): Boolean {
+        val connection = dbHandler.getConnection() ?: return false
+
+        val skullData = getRawSkullData()
 
         val insertQuery = """
             INSERT INTO skulls (team_id, entity_type, earned, collected)
