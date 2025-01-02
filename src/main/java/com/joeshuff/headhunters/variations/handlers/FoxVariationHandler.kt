@@ -1,5 +1,6 @@
 package com.joeshuff.headhunters.variations.handlers
 
+import com.joeshuff.headhunters.data.models.SkullSourceData
 import com.joeshuff.headhunters.variations.VariationHandler
 import org.bukkit.entity.Fox
 import org.bukkit.entity.LivingEntity
@@ -12,9 +13,5 @@ class FoxVariationHandler: VariationHandler() {
         val type = entity.foxType.name.lowercase()
 
         return type
-    }
-
-    override fun applyVariationToStack(itemStack: ItemStack, variation: String?): ItemStack {
-        return itemStack
     }
 }

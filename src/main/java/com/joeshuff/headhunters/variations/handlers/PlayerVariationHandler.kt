@@ -1,5 +1,6 @@
 package com.joeshuff.headhunters.variations.handlers
 
+import com.joeshuff.headhunters.data.models.SkullSourceData
 import com.joeshuff.headhunters.variations.VariationHandler
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -15,7 +16,11 @@ class PlayerVariationHandler: VariationHandler() {
         return entity.uniqueId.toString()
     }
 
-    override fun applyVariationToStack(itemStack: ItemStack, variation: String?): ItemStack {
+    override fun applyVariationToStack(
+        itemStack: ItemStack,
+        variation: String?,
+        rawSkullSourceData: SkullSourceData
+    ): ItemStack {
         val skullMeta = (itemStack.itemMeta as? SkullMeta)?: return itemStack
 
         if (variation == null) return itemStack

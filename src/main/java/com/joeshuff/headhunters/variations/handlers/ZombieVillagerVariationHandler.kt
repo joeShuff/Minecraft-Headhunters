@@ -1,5 +1,6 @@
 package com.joeshuff.headhunters.variations.handlers
 
+import com.joeshuff.headhunters.data.models.SkullSourceData
 import com.joeshuff.headhunters.variations.VariationHandler
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.ZombieVillager
@@ -19,9 +20,5 @@ class ZombieVillagerVariationHandler: VariationHandler() {
         //        return "${biome}_$profession"
 
         return profession
-    }
-
-    override fun applyVariationToStack(itemStack: ItemStack, variation: String?): ItemStack {
-        return itemStack
     }
 }

@@ -1,5 +1,7 @@
 package com.joeshuff.headhunters.data.models
 
+import com.google.gson.annotations.SerializedName
+
 data class SkullDBData(
         val id: Int,
         val teamId: String,
@@ -19,7 +21,7 @@ data class SkullSourceData(
 )
 
 data class SkullSourceVariation(
-        val variationName: String,
-        val variationTexture: String,
-        val variationNbtData: String
+        @SerializedName("name") val variationName: String,
+        @SerializedName("skullTexture") val variationTexture: String,
+        @SerializedName("id") val id: String
 )

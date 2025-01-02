@@ -1,20 +1,24 @@
 package com.joeshuff.headhunters.util
 
-import com.destroystokyo.paper.profile.ProfileProperty
-import com.google.gson.Gson
 import com.joeshuff.headhunters.HeadHuntersPlugin
 import com.joeshuff.headhunters.data.models.SkullDBData
 import com.joeshuff.headhunters.data.models.SkullSourceData
+import com.joeshuff.headhunters.database.SkullDatabaseHandler
 import com.joeshuff.headhunters.variations.VariationFactory
-import org.bukkit.*
+import org.bukkit.ChatColor
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import org.bukkit.persistence.PersistentDataType
-import java.io.InputStreamReader
 import java.util.*
 
-class SkullController(val plugin: HeadHuntersPlugin) {
+class SkullController(
+    val plugin: HeadHuntersPlugin,
+    val skullDatabaseHandler: SkullDatabaseHandler
+) {
 
     val skullTextures = mutableMapOf<EntityType, SkullSourceData>()
 
@@ -23,16 +27,9 @@ class SkullController(val plugin: HeadHuntersPlugin) {
     }
 
     private fun loadSkullData() {
-        try {
-            val resourceStream = plugin.getResource("skull_data.json")
-            val reader = InputStreamReader(resourceStream)
-            val skullDataList = Gson().fromJson(reader, Array<SkullSourceData>::class.java)
-            skullDataList.forEach { skullData ->
-                val entityType = EntityType.fromName(skullData.entityType) ?: return@forEach
-                skullTextures[entityType] = skullData
-            }
-        } catch (e: Exception) {
-            plugin.logger.severe("Error loading skull data: ${e.message}")
+        skullDatabaseHandler.getRawSkullData().forEach { skullData ->
+            val entityType = EntityType.fromName(skullData.entityType) ?: return@forEach
+            skullTextures[entityType] = skullData
         }
     }
 
@@ -59,12 +56,11 @@ class SkullController(val plugin: HeadHuntersPlugin) {
         earnedPlayerUUID: String?,
         earnedVariation: String? = null
     ): ItemStack? {
-        val skullTexture = getSkullTextureForEntityType(entityType)
         val skullMaterial = getSkullTypeVanilla(entityType)
 
         var skull = ItemStack(skullMaterial) // Create a player skull item
 
-        val skullMeta = skull.itemMeta as SkullMeta // Get the meta for the skull
+        var skullMeta = skull.itemMeta as SkullMeta // Get the meta for the skull
 
         // Set the display name
         val displayName = "${ChatColor.DARK_GREEN}${entityType.toDisplayString()} Skull"
@@ -72,24 +68,19 @@ class SkullController(val plugin: HeadHuntersPlugin) {
         skull.itemMeta = skullMeta
 
         if (skullMaterial == Material.PLAYER_HEAD) {
-            VariationFactory.getHandler(entityType)?.applyVariationToStack(skull, earnedVariation)?.let {
-                skull = it
-            }
-
-            if (entityType != EntityType.PLAYER) {
-                if (skullTexture == null) {
-                    plugin.logger.severe("No texture data for $entityType")
-                    return null
+            skullTextures[entityType]?.let { rawData ->
+                VariationFactory.getHandler(entityType)?.applyVariationToStack(skull, earnedVariation, rawData)
+                    ?.let {
+                        skull = it
+                    } ?: run {
+                    getSkullTextureForEntityType(entityType)?.let { skull.applyTexture(it) }
                 }
-
-                val uuid = UUID.randomUUID()
-                val profile = Bukkit.createProfile(uuid, uuid.toString().substring(0, 16))
-
-                // Apply the texture using the Property class from authlib
-                profile.setProperty(ProfileProperty("textures", skullTexture))
-                skullMeta.playerProfile = profile
+            } ?: {
+                plugin.logger.severe("No raw skull data for $entityType")
             }
         }
+
+        skullMeta = skull.itemMeta as SkullMeta // Get the meta for the skull
 
         val lore = mutableListOf<String>()
         val description = if (earnedPlayerUUID != null) {

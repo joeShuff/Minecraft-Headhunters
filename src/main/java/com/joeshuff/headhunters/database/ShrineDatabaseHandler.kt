@@ -21,7 +21,7 @@ class ShrineDatabaseHandler(
 
     private fun getShrineRadius(): Double {
         // Retrieve the shrine radius from the config
-        val radius = plugin.config.getDouble("shrine-radius", 15.0)  // Default value is 10.0 if not set
+        val radius = plugin.config.getDouble("shrine-radius", 15.0)
         return radius
     }
 
