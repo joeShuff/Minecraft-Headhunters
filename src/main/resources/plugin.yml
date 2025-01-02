@@ -20,7 +20,7 @@ commands:
     usage: /<command>
   missing:
     description: See what mob heads are still needed by your team.
-    usage: /<command>
+    usage: /<command> <category>
   globalprogress:
     description: View the global progress of all teams.
     usage: /<command>
@@ -35,7 +35,7 @@ commands:
     usage: /leaveteam
   earn:
     description: Force earn a skull (Admin Only)
-    usage: /earn <mob_name> <team_id>
+    usage: /earn <team_id> <mob type> <variation>
   teams:
     description: List all teams (Admin Only)
     usage: /teams

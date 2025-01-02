@@ -25,7 +25,15 @@ class EarnCommand(
 
         return when (args.size) {
             1 -> {
-                val team = teamDatabaseHandler.getTeamForPlayer(sender)
+                val allTeams = teamDatabaseHandler.getAllTeams()
+
+                return allTeams.map { it.id }.toMutableList()
+            }
+
+            2 -> {
+                val argOne = args.getOrNull(0)?: return mutableListOf()
+
+                val team = teamDatabaseHandler.getTeamById(argOne)
                     ?: return skullDatabaseHandler.getRawSkullData().map { it.entityType }.toMutableList()
 
                 val allHeads = skullDatabaseHandler.getSkullData(team.id)
@@ -33,12 +41,6 @@ class EarnCommand(
                     .map { it.entityType }
                     .filter { it.startsWith(args[0], ignoreCase = true) }
                     .toMutableList()
-            }
-
-            2 -> {
-                val allTeams = teamDatabaseHandler.getAllTeams()
-
-                return allTeams.map { it.id }.toMutableList()
             }
 
             else -> mutableListOf()
@@ -53,31 +55,34 @@ class EarnCommand(
 
         // Validate number of arguments
         if (args.isEmpty()) {
-            sender.sendMessage("${ChatColor.GOLD}Please provide an entity type.")
+            sender.sendMessage("${ChatColor.GOLD}Please provide a team and an entity type.")
             return true
         }
 
-        // Get the entity type (first argument)
+        // Get the team name
+        val teamId = args.getOrNull(0)
+
+        if (teamId == null) {
+            sender.sendMessage("${ChatColor.RED}You must provide a valid team ID.")
+            return true
+        }
+
+        // Get the entity type
+        val entityTypeInput = args.getOrNull(1)
+
+        if (entityTypeInput == null) {
+            sender.sendMessage("${ChatColor.RED}You must provide an entity type.")
+            return true
+        }
+
         val entityType = try {
-            EntityType.valueOf(args[0].toUpperCase())
+            EntityType.valueOf(entityTypeInput.toUpperCase())
         } catch (e: IllegalArgumentException) {
             sender.sendMessage("${ChatColor.RED}Invalid entity type. Please provide a valid entity type.")
             return true
         }
 
-        // Get the team name (remaining arguments)
-        val teamId =
-            if (args.size == 1) {
-                val team = teamDatabaseHandler.getTeamForPlayer(sender)
-                team?.id
-            } else args.getOrNull(1)
-
-        if (teamId == null) {
-            sender.sendMessage("${ChatColor.RED}You must be on a team, or provide a valid team ID.")
-            return true
-        }
-
-        // Retrieve the team by name
+        // Retrieve the team by ID
         val team = teamDatabaseHandler.getTeamById(teamId)
 
         if (team == null) {

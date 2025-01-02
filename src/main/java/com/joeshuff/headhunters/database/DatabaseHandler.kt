@@ -65,7 +65,7 @@ class DatabaseHandler(private val plugin: Plugin) {
                     earned_by TEXT,
                     earned_at INTEGER,
                     collected BOOLEAN NOT NULL DEFAULT 0,
-                    killed_info TEXT DEFAULT NULL,
+                    earned_variation TEXT DEFAULT NULL,
                     FOREIGN KEY (team_id) REFERENCES teams(ID)
                 );
             """,

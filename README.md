@@ -31,12 +31,12 @@ Here’s a list of commands available in the Headhunters plugin:
 
 ### Progress Tracking
 - **`/progress`**: View your team’s collection progress.
-- **`/missing`**: List the mobs your team still needs to collect.
+- **`/missing <category>`**: List the mobs your team still needs to collect. (Optional category)
 - **`/globalprogress`**: See other teams' overall progress (does not show specific heads).
 
 ### Skull Management
 - **`/resummon <entity_type>`**: Resummon a skull for your team, if it has already been earned.
-- **`/earn <entity_type> [team_name]`**: (Admin) Mark a skull as earned for a team.
+- **`/earn [team_id] <entity_type> <variation>`**: (Admin) Mark a skull as earned for a team.
 
 ## Thanks
 Special thanks to:
