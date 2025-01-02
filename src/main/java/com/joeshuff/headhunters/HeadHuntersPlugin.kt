@@ -19,15 +19,15 @@ class HeadHuntersPlugin : JavaPlugin() {
 
     private val stoppables = arrayListOf<Stoppable>()
 
-    private val regionManager = RegionManager()
+    private val regionManager by lazy { RegionManager() }
 
-    private val dbHandler = DatabaseHandler(this)
+    private val dbHandler by lazy { DatabaseHandler(this) }
 
-    private val shrineDatabaseHandler = ShrineDatabaseHandler(this, dbHandler, regionManager)
-    private val teamDatabaseHandler = TeamDatabaseHandler(this, dbHandler)
-    private val skullDatabaseHandler = SkullDatabaseHandler(this, dbHandler)
+    private val shrineDatabaseHandler by lazy { ShrineDatabaseHandler(this, dbHandler, regionManager) }
+    private val teamDatabaseHandler by lazy { TeamDatabaseHandler(this, dbHandler) }
+    private val skullDatabaseHandler by lazy { SkullDatabaseHandler(this, dbHandler) }
 
-    private val skullController = SkullController(this, skullDatabaseHandler)
+    private val skullController by lazy { SkullController(this, skullDatabaseHandler) }
 
     private val bossBarManager = BossBarManager()
 

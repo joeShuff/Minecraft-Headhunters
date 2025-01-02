@@ -113,23 +113,23 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version> <!-- Replace with your Minecraft version -->
+            <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10.1</version> <!-- You can use the latest version if needed -->
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.1-jre</version> <!-- Choose a stable version -->
+            <version>31.1-jre</version>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
-            <version>3.13.56</version> <!-- Or the latest version available -->
+            <version>3.13.56</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

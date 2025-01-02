@@ -41,7 +41,7 @@ class ResummonCommand(
             return true
         }
 
-        val allHeads = skullDatabaseHandler.getSkullData(team.id).filter { it.earned }
+        val allHeads = skullDatabaseHandler.getSkullData(team.id, extendVariations = true).filter { it.earned }
         if (allHeads.isEmpty()) {
             sender.sendMessage("${ChatColor.RED}Your team has not earned any skulls to resummon.")
             return true
@@ -72,6 +72,7 @@ class ResummonCommand(
         var inventorySlot = 1 // Start at column 2 (skipping the first column)
         for (skullData in currentSkulls) {
             val entityType = EntityType.fromName(skullData.entityType) ?: continue
+
             val item = skullController.getSkullItemStack(entityType, skullData.earnedBy, skullData.earnedVariation)
 
             inventory.setItem(inventorySlot, item)
@@ -132,8 +133,9 @@ class ResummonCommand(
                     when (meta.displayName) {
                         "${ChatColor.GREEN}Next Page" -> {
                             val currentPage = extractPageNumber(inventoryTitle)
-                            openPagedInventory(player,
-                                skullDatabaseHandler.getSkullData(teamDatabaseHandler.getTeamForPlayer(player)!!.id)
+                            openPagedInventory(
+                                player,
+                                skullDatabaseHandler.getSkullData(teamDatabaseHandler.getTeamForPlayer(player)!!.id, extendVariations = true)
                                     .filter { it.earned },
                                 shrineLocation,
                                 currentPage + 1
@@ -142,8 +144,9 @@ class ResummonCommand(
 
                         "${ChatColor.GREEN}Previous Page" -> {
                             val currentPage = extractPageNumber(inventoryTitle)
-                            openPagedInventory(player,
-                                skullDatabaseHandler.getSkullData(teamDatabaseHandler.getTeamForPlayer(player)!!.id)
+                            openPagedInventory(
+                                player,
+                                skullDatabaseHandler.getSkullData(teamDatabaseHandler.getTeamForPlayer(player)!!.id, extendVariations = true)
                                     .filter { it.earned },
                                 shrineLocation,
                                 currentPage - 1

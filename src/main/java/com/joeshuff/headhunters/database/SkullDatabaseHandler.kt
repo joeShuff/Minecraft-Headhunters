@@ -153,7 +153,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
     }
 
     // Get the skull data for a team (returns a list of all skull records for the team)
-    fun getSkullData(teamId: String): List<SkullDBData> {
+    fun getSkullData(teamId: String, extendVariations: Boolean = false): List<SkullDBData> {
         val connection = dbHandler.getConnection() ?: return emptyList()
         val query = """
             SELECT id, team_id, entity_type, earned, earned_by, earned_at, collected, earned_variation
@@ -167,17 +167,28 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
             val resultSet = statement.executeQuery()
 
             while (resultSet.next()) {
+                val entityType = resultSet.getString("entity_type")
+
                 val skullData = SkullDBData(
                     id = resultSet.getInt("id"),
                     teamId = resultSet.getString("team_id"),
-                    entityType = resultSet.getString("entity_type"),
+                    entityType = entityType,
                     earned = resultSet.getBoolean("earned"),
                     earnedBy = resultSet.getString("earned_by"),
                     earnedAt = resultSet.getLong("earned_at"),
                     collected = resultSet.getBoolean("collected"),
                     earnedVariation = resultSet.getString("earned_variation")
                 )
-                skullDataList.add(skullData)
+
+                if (extendVariations) {
+                    getRawSkullData().find { it.entityType == entityType }?.let {
+                        it.variations.forEach {
+                            skullDataList.add(skullData.copy(earnedVariation = it.id))
+                        }
+                    }
+                } else {
+                    skullDataList.add(skullData)
+                }
             }
         } catch (e: SQLException) {
             plugin.logger.severe("Error retrieving skull data: ${e.message}")

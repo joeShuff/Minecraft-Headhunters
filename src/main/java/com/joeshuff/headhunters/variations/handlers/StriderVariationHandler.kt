@@ -10,6 +10,6 @@ class StriderVariationHandler: VariationHandler() {
     override fun extractVariation(entity: LivingEntity): String? {
         if (entity !is Strider) return null
 
-        return if (entity.isShivering) "shivering" else null
+        return if (entity.isShivering) "shivering" else "non_shivering"
     }
 }
