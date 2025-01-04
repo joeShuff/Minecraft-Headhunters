@@ -14,7 +14,8 @@ object VariationFactory {
         EntityType.VILLAGER to VillagerVariationHandler(),
         EntityType.ZOMBIE_VILLAGER to ZombieVillagerVariationHandler(),
         EntityType.FOX to FoxVariationHandler(),
-        EntityType.STRIDER to StriderVariationHandler()
+        EntityType.STRIDER to StriderVariationHandler(),
+        EntityType.HORSE to HorseVariationHandler()
     )
 
     fun getHandler(entityType: EntityType): VariationHandler? {

@@ -3,6 +3,7 @@ package com.joeshuff.headhunters.listeners
 import com.joeshuff.headhunters.HeadHuntersPlugin
 import com.joeshuff.headhunters.database.SkullDatabaseHandler
 import com.joeshuff.headhunters.database.TeamDatabaseHandler
+import com.joeshuff.headhunters.util.SkullController
 import com.joeshuff.headhunters.variations.VariationFactory
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -16,8 +17,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 
 class SkullEarnedListener(
     private val plugin: HeadHuntersPlugin,
-    private val teamDatabaseHandler: TeamDatabaseHandler,
-    private val skullDatabaseHandler: SkullDatabaseHandler
+    private val skullController: SkullController
 ) : Listener, Stoppable {
 
     init {
@@ -25,33 +25,15 @@ class SkullEarnedListener(
     }
 
     private fun playerKilledEntity(killer: Player, entity: LivingEntity) {
-        val playerTeam = teamDatabaseHandler.getTeamForPlayer(killer) ?: return  // Check if the player is on a team
-
         val entityType = entity.type
 
         val variationInfo = VariationFactory.getHandler(entityType)?.extractVariation(entity)
 
-        if (skullDatabaseHandler.isSkullEarned(playerTeam.id, entityType)) {
-            return  // EntityType is already earned for this team
-        }
-
-        // Mark the skull as earned
-        val markedAsEarned = skullDatabaseHandler.markSkullEarned(
-            teamId = playerTeam.id,
-            player = killer,
-            entityType = entityType,
-            earnedVariation = variationInfo
+        skullController.onSkullEarn(
+            entityType,
+            killer,
+            variationInfo
         )
-
-        if (markedAsEarned) {
-            teamDatabaseHandler.getPlayerGuidsForTeam(playerTeam.id).forEach {
-                Bukkit.getPlayer(it)?.let {
-                    it.sendMessage("${ChatColor.GREEN}Your team has earned the ${ChatColor.GOLD}${entityType.name}${ChatColor.GREEN} skull, thanks to ${killer.name}!")
-                }
-            }
-        } else {
-            plugin.logger.warning("Failed to mark skull as earned for ${playerTeam.id} and entity type ${entityType.name}.")
-        }
     }
 
     @EventHandler

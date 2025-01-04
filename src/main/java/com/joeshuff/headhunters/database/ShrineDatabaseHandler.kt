@@ -101,6 +101,8 @@ class ShrineDatabaseHandler(
             if (success) {
                 regionManager.upsertRegion(teamId, location, getShrineRadius())
             }
+
+            connection.commit()
         } catch (e: SQLException) {
             plugin.logger.severe("Error setting shrine data: ${e.message}")
         }

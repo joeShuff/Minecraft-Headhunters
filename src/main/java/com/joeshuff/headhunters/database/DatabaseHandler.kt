@@ -33,10 +33,10 @@ class DatabaseHandler(private val plugin: Plugin) {
                 val newConnection = DriverManager.getConnection(dbUrl)
                 newConnection.autoCommit = true
 
-                connection = newConnection
-
                 plugin.logger.info("Database connection established successfully.")
-                createTables()
+                createTables(newConnection)
+
+                newConnection.close()
             }
         } catch (e: SQLException) {
             plugin.logger.severe("Error initializing database: ${e.message}")
@@ -44,7 +44,7 @@ class DatabaseHandler(private val plugin: Plugin) {
     }
 
     // Create necessary tables
-    private fun createTables() {
+    private fun createTables(connection: Connection) {
         val tables = mapOf(
             "teams" to """
                 CREATE TABLE IF NOT EXISTS teams (
@@ -80,7 +80,7 @@ class DatabaseHandler(private val plugin: Plugin) {
 
         tables.forEach { (name, query) ->
             try {
-                connection?.createStatement()?.use { it.executeUpdate(query) }
+                connection.createStatement()?.use { it.executeUpdate(query) }
                 plugin.logger.info("Table '$name' ensured successfully.")
             } catch (e: SQLException) {
                 plugin.logger.severe("Error creating table '$name': ${e.message}")
@@ -92,7 +92,11 @@ class DatabaseHandler(private val plugin: Plugin) {
     fun getConnection(): Connection? {
         if (connection == null || connection?.isClosed == true) {
             try {
-                connection = DriverManager.getConnection(dbUrl)
+                val newConnection = DriverManager.getConnection(dbUrl)
+                newConnection.autoCommit = false
+
+                connection = newConnection
+
                 plugin.logger.info("Re-established database connection.")
             } catch (e: SQLException) {
                 throw IllegalStateException("Could not re-establish database connection: ${e.message}")

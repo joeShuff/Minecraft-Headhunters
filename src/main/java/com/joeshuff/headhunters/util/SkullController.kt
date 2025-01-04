@@ -4,12 +4,11 @@ import com.joeshuff.headhunters.HeadHuntersPlugin
 import com.joeshuff.headhunters.data.models.SkullDBData
 import com.joeshuff.headhunters.data.models.SkullSourceData
 import com.joeshuff.headhunters.database.SkullDatabaseHandler
+import com.joeshuff.headhunters.database.TeamDatabaseHandler
 import com.joeshuff.headhunters.variations.VariationFactory
-import org.bukkit.ChatColor
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
+import org.bukkit.*
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import org.bukkit.persistence.PersistentDataType
@@ -17,7 +16,8 @@ import java.util.*
 
 class SkullController(
     val plugin: HeadHuntersPlugin,
-    val skullDatabaseHandler: SkullDatabaseHandler
+    val skullDatabaseHandler: SkullDatabaseHandler,
+    val teamDatabaseHandler: TeamDatabaseHandler
 ) {
 
     val skullTextures = mutableMapOf<EntityType, SkullSourceData>()
@@ -30,6 +30,36 @@ class SkullController(
         skullDatabaseHandler.getRawSkullData().forEach { skullData ->
             val entityType = EntityType.fromName(skullData.entityType) ?: return@forEach
             skullTextures[entityType] = skullData
+        }
+    }
+
+    fun onSkullEarn(
+        entityType: EntityType,
+        player: Player,
+        earnedVariation: String? = null
+    ) {
+        val playerTeam = teamDatabaseHandler.getTeamForPlayer(player) ?: return  // Check if the player is on a team
+
+        if (skullDatabaseHandler.isSkullEarned(playerTeam.id, entityType)) {
+            return  // EntityType is already earned for this team
+        }
+
+        // Mark the skull as earned
+        val markedAsEarned = skullDatabaseHandler.markSkullEarned(
+            teamId = playerTeam.id,
+            player = player,
+            entityType = entityType,
+            earnedVariation = earnedVariation
+        )
+
+        if (markedAsEarned) {
+            teamDatabaseHandler.getPlayerGuidsForTeam(playerTeam.id).forEach {
+                Bukkit.getPlayer(it)?.let {
+                    it.sendMessage("${ChatColor.GREEN}Your team has earned the ${ChatColor.GOLD}${entityType.name}${ChatColor.GREEN} skull, thanks to ${player.name}!")
+                }
+            }
+        } else {
+            plugin.logger.warning("Failed to mark skull as earned for ${playerTeam.id} and entity type ${entityType.name}.")
         }
     }
 

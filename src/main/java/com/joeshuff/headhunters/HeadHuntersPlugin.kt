@@ -6,9 +6,7 @@ import com.joeshuff.headhunters.database.DatabaseHandler
 import com.joeshuff.headhunters.database.ShrineDatabaseHandler
 import com.joeshuff.headhunters.database.SkullDatabaseHandler
 import com.joeshuff.headhunters.database.TeamDatabaseHandler
-import com.joeshuff.headhunters.listeners.PlayerListener
-import com.joeshuff.headhunters.listeners.SkullEarnedListener
-import com.joeshuff.headhunters.listeners.Stoppable
+import com.joeshuff.headhunters.listeners.*
 import com.joeshuff.headhunters.regions.RegionManager
 import com.joeshuff.headhunters.timers.TeamProgressTask
 import com.joeshuff.headhunters.util.BossBarManager
@@ -21,13 +19,13 @@ class HeadHuntersPlugin : JavaPlugin() {
 
     private val regionManager by lazy { RegionManager() }
 
-    private val dbHandler by lazy { DatabaseHandler(this) }
+    private val dbHandler = DatabaseHandler(this)
 
     private val shrineDatabaseHandler by lazy { ShrineDatabaseHandler(this, dbHandler, regionManager) }
     private val teamDatabaseHandler by lazy { TeamDatabaseHandler(this, dbHandler) }
     private val skullDatabaseHandler by lazy { SkullDatabaseHandler(this, dbHandler) }
 
-    private val skullController by lazy { SkullController(this, skullDatabaseHandler) }
+    private val skullController by lazy { SkullController(this, skullDatabaseHandler, teamDatabaseHandler) }
 
     private val bossBarManager = BossBarManager()
 
@@ -90,7 +88,10 @@ class HeadHuntersPlugin : JavaPlugin() {
     }
 
     private fun registerEventListeners() {
-        stoppables.add(SkullEarnedListener(this, teamDatabaseHandler, skullDatabaseHandler))
+        stoppables.add(SkullEarnedListener(this, skullController))
+        stoppables.add(CreakingKillListener(this, skullController))
         stoppables.add(PlayerListener(this, regionManager, teamDatabaseHandler, skullDatabaseHandler, skullController))
+        stoppables.add(HorseSpawnListener(this))
+        stoppables.add(ServerPingListener(this, teamDatabaseHandler))
     }
 }

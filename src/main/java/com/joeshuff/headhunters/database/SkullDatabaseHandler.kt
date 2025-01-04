@@ -55,6 +55,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
 
             val affectedRows = statement.executeBatch()
             connection.commit()
+
             return affectedRows.sum() > 0
         } catch (e: SQLException) {
             plugin.logger.severe("Error seeding team skulls: ${e.message}")
@@ -78,6 +79,8 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
             statement.setString(5, entityType.name) // Set the entity type
 
             val rowsAffected = statement.executeUpdate()
+            connection.commit()
+
             return rowsAffected > 0
         } catch (e: SQLException) {
             plugin.logger.severe("Error marking skull as earned: ${e.message}")
@@ -86,7 +89,7 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
     }
 
     // Mark a skull as collected
-    fun markSkullCollected(teamId: String, entityType: EntityType): Boolean {
+    fun markSkullCollected(teamId: String, entityType: String): Boolean {
         val connection = dbHandler.getConnection() ?: return false
         val updateQuery = """
             UPDATE skulls
@@ -96,9 +99,11 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
         try {
             val statement = connection.prepareStatement(updateQuery)
             statement.setString(1, teamId)
-            statement.setString(2, entityType.name)
+            statement.setString(2, entityType)
 
             val rowsAffected = statement.executeUpdate()
+            connection.commit()
+
             return rowsAffected > 0
         } catch (e: SQLException) {
             plugin.logger.severe("Error marking skull as collected: ${e.message}")
@@ -182,8 +187,12 @@ class SkullDatabaseHandler(private val plugin: HeadHuntersPlugin, private val db
 
                 if (extendVariations) {
                     getRawSkullData().find { it.entityType == entityType }?.let {
-                        it.variations.forEach {
-                            skullDataList.add(skullData.copy(earnedVariation = it.id))
+                        if (it.variations.isEmpty()) {
+                            skullDataList.add(skullData)
+                        } else {
+                            it.variations.forEach {
+                                skullDataList.add(skullData.copy(earnedVariation = it.id))
+                            }
                         }
                     }
                 } else {

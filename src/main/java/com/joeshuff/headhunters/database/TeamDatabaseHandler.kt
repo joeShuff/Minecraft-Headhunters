@@ -32,6 +32,8 @@ class TeamDatabaseHandler(val plugin: HeadHuntersPlugin, val dbHandler: Database
             statement.setInt(6, 0) // shrine_z (default to 0)
 
             val rowsAffected = statement.executeUpdate()
+            connection.commit()
+
             if (rowsAffected > 0) {
                 // Team creation succeeded, now add the player to the team
                 return addPlayerToTeam(player, teamId)
@@ -112,6 +114,8 @@ class TeamDatabaseHandler(val plugin: HeadHuntersPlugin, val dbHandler: Database
             statement.setString(2, teamId)
 
             val rowsAffected = statement.executeUpdate()
+            connection.commit()
+
             return rowsAffected > 0
         } catch (e: SQLException) {
             plugin.logger.severe("Error adding player to team: ${e.message}")
@@ -128,6 +132,8 @@ class TeamDatabaseHandler(val plugin: HeadHuntersPlugin, val dbHandler: Database
             statement.setString(1, player.uniqueId.toString())
 
             val rowsAffected = statement.executeUpdate()
+            connection.commit()
+
             return rowsAffected > 0
         } catch (e: SQLException) {
             plugin.logger.severe("Error removing player from team: ${e.message}")
