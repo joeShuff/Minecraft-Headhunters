@@ -21,6 +21,10 @@ class TeamProgressTask(
             val team = teamDbHandler.getTeamForPlayer(player)
 
             if (team != null) {
+                if (team.shrineLocation == null) {
+                    sendSetShrinePrompt(player)
+                }
+
                 val allSkulls = skullDbHandler.getSkullData(team.id)
                 val earnedSkulls = skullDbHandler.getSkullData(team.id).count { it.earned }
                 val progress = if (allSkulls.isEmpty()) 0.0 else earnedSkulls.toDouble() / allSkulls.size
@@ -41,6 +45,17 @@ class TeamProgressTask(
         val actionBarMessage = Component.text("/createteam <team name>")
             .color(NamedTextColor.DARK_GREEN)
             .append(Component.text(" or ask for an invite!")
+                .color(NamedTextColor.YELLOW)
+                .decorate(TextDecoration.ITALIC))
+
+        // Send the action bar message to the player
+        player.sendActionBar(actionBarMessage)
+    }
+
+    private fun sendSetShrinePrompt(player: Player) {
+        val actionBarMessage = Component.text("/setshrine")
+            .color(NamedTextColor.DARK_GREEN)
+            .append(Component.text(" to set your teams shrine!")
                 .color(NamedTextColor.YELLOW)
                 .decorate(TextDecoration.ITALIC))
 
