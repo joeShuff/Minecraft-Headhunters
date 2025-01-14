@@ -1,5 +1,6 @@
 package com.joeshuff.headhunters
 
+import com.joeshuff.headhunters.commands.HelpCommand
 import com.joeshuff.headhunters.commands.skulls.*
 import com.joeshuff.headhunters.commands.teams.*
 import com.joeshuff.headhunters.database.DatabaseHandler
@@ -85,6 +86,8 @@ class HeadHuntersPlugin : JavaPlugin() {
         getCommand("globalprogress")?.setExecutor(GlobalProgressCommand(teamDatabaseHandler, skullDatabaseHandler))
 
         getCommand("earn")?.setExecutor(EarnCommand(teamDatabaseHandler, skullDatabaseHandler))
+
+        getCommand("headhuntershelp")?.setExecutor(HelpCommand())
     }
 
     private fun registerEventListeners() {

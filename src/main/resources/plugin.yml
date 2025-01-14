@@ -39,3 +39,6 @@ commands:
   teams:
     description: List all teams (Admin Only)
     usage: /teams
+  headhuntershelp:
+    description: View help details for Headhunters
+    usage: /headhuntershelp

@@ -9,7 +9,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntitySpawnEvent
 import org.bukkit.event.world.ChunkPopulateEvent
 
-class HorseSpawnListener(plugin: HeadHuntersPlugin) : Listener, Stoppable {
+class HorseSpawnListener(val plugin: HeadHuntersPlugin) : Listener, Stoppable {
 
     private var chanceForSkeleton: Double = 0.15
     private var chanceForZombie: Double = 0.15
@@ -57,6 +57,7 @@ class HorseSpawnListener(plugin: HeadHuntersPlugin) : Listener, Stoppable {
     @EventHandler
     fun onHorseSpawn(event: EntitySpawnEvent) {
         val entity = event.entity
+
 
         // Check if the spawned entity is a horse
         if (entity.type == EntityType.HORSE) {

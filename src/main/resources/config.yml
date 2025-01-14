@@ -1,3 +1,4 @@
 shrine-radius: 15.0  # This is the radius for the shrine
 zombie-horse-chance: 0.05
 skeleton-horse-chance: 0.05
+send-help-on-join: true
