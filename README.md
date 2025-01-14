@@ -1,7 +1,7 @@
 # Headhunters Minecraft Plugin
 
 <p align="center">
-  <img src="./art/Headhunters-Logo.jpg" alt="Headhunters Logo" style="max-height: 200px;"/>
+  <img src="./art/Headhunters-Logo.jpg" alt="Headhunters Logo" style="max-height: 50px;"/>
 </p>
 
 <div align="center">
