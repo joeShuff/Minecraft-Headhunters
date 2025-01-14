@@ -1,12 +1,12 @@
 # Headhunters Minecraft Plugin
 
 <div align="center">
-  <img src="./art/Headhunters-Logo.jpg" alt="Headhunters Logo" height="50"/>
+  <img src="./art/Headhunters-Logo.jpg" alt="Headhunters Logo" height="200"/>
 </div>
 
 <div align="center">
   <a href="https://github.com/joeShuff/Minecraft-Headhunters/releases/latest/download/HeadHunters.jar" download>
-    <img src="/art/download-button.png" alt="Download Button" />
+    <img src="/art/download-button.png" alt="Download Button" height="100" />
   </a>
 </div>
 
