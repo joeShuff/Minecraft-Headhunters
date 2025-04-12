@@ -33,8 +33,10 @@ class RegionManager {
     // Check if a player is within any region
     fun getRegionPlayerIsIn(player: Player): String? {
         for (region in regions.values) {
-            if (region.location.distance(player.location) <= region.radius) {
-                return region.regionId
+            if (region.location.world.name == player.location.world.name) {
+                if (region.location.distance(player.location) <= region.radius) {
+                    return region.regionId
+                }
             }
         }
         return null
